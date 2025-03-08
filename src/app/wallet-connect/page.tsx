@@ -2,10 +2,20 @@
 import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
 import { useRouter } from 'next/navigation';
+import { useActiveWallet } from "thirdweb/react";
 import { client } from "@/client";
+import { useEffect } from "react";
 
 export default function WalletConnect() {
   const router = useRouter();
+  const wallet = useActiveWallet(client);
+
+  useEffect(() => {
+    if (wallet) {
+      console.log("Wallet already connected, redirecting...");
+      router.replace('/mint');
+    }
+  }, [wallet, router]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -34,7 +44,13 @@ export default function WalletConnect() {
             <div className="text-center">
               <p className="text-white text-lg mb-4">CONNECT YOUR WALLET</p>
               <div className="w-full bg-[#6d5ceb]/20 hover:bg-[#6d5ceb]/30 backdrop-blur-sm text-white rounded-xl p-4">
-                <ConnectButton client={client} />
+                <ConnectButton 
+                  client={client}
+                  onConnect={() => {
+                    console.log("Wallet connected, redirecting...");
+                    router.replace('/mint');
+                  }}
+                />
               </div>
             </div>
           </div>

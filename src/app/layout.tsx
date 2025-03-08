@@ -4,6 +4,9 @@ import localFont from "next/font/local";
 import { Toaster } from 'react-hot-toast';
 import { ThirdwebProvider } from "thirdweb/react";
 import { client } from "@/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 // Load Digitalt font
 const digitalt = localFont({
@@ -21,10 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={digitalt.className}>
       <body suppressHydrationWarning={true} className={digitalt.className}>
-        <ThirdwebProvider client={client}>
-          {children}
-          <Toaster position="top-center" />
-        </ThirdwebProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThirdwebProvider client={client}>
+            {children}
+            <Toaster position="top-center" />
+          </ThirdwebProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

@@ -3,7 +3,8 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { useAddress, useDisconnect } from "@thirdweb-dev/react";
+import { useActiveWallet } from "thirdweb/react";
+import { client } from "@/client";
 
 export default function Home() {
   // State for sound toggle and settings/info modals
@@ -14,18 +15,85 @@ export default function Home() {
   const MIN_COUNT = 1;
   const MAX_COUNT = 100;
   const [isMinted, setIsMinted] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Inside your Home component, add the router
   const router = useRouter();
-  const address = useAddress();
-  const disconnect = useDisconnect();
+  const wallet = useActiveWallet();
 
-  // Redirect to wallet-connect if not connected
   useEffect(() => {
-    if (!address) {
-      router.replace('/wallet-connect');
+    console.log("=== MINT PAGE MOUNT ===");
+    console.log("Initial wallet state:", wallet);
+    console.log("Initial isConnected state:", isConnected);
+  }, []);
+
+  useEffect(() => {
+    console.log("=== WALLET EFFECT TRIGGERED ===");
+    console.log("Wallet value:", wallet);
+    if (wallet) {
+      console.log("Wallet properties:");
+      try {
+        // Log all enumerable properties
+        for (const key in wallet) {
+          console.log(`${key}:`, wallet[key]);
+        }
+        
+        // Try to get account info
+        if (wallet.getAccount) {
+          const account = wallet.getAccount();
+          console.log("Wallet account:", account);
+        }
+        
+        // Log the prototype chain
+        console.log("Prototype chain:", Object.getPrototypeOf(wallet));
+        
+        setIsConnected(true);
+        setIsLoading(false);
+      } catch (e) {
+        console.error("Error logging wallet properties:", e);
+        setIsConnected(false);
+        setIsLoading(false);
+      }
+    } else {
+      console.log("No wallet found in effect");
+      setIsConnected(false);
+      setIsLoading(false);
     }
-  }, [address, router]);
+  }, [wallet]);
+
+  const handleDisconnect = async () => {
+    console.log("=== DISCONNECT INITIATED ===");
+    try {
+      console.log("Wallet before disconnect:", wallet);
+      console.log("Disconnecting wallet...");
+      await wallet?.disconnect();
+      console.log("Wallet after disconnect:", wallet);
+      console.log("Setting isConnected to false");
+      setIsConnected(false);
+      
+      console.log("Clearing localStorage items");
+      // Clear all localStorage items related to wallet
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('wallet') || key.includes('thirdweb')) {
+          console.log(`Removing localStorage key: ${key}`);
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (error) {
+      console.error("=== DISCONNECT ERROR ===");
+      console.error("Error details:", error);
+      toast('Failed to disconnect wallet', {
+        icon: '❌',
+        style: {
+          borderRadius: '10px',
+          background: '#FF3B3B',
+          color: '#fff',
+          fontWeight: 'bold',
+        },
+        duration: 2000,
+      });
+    }
+  };
 
   const handlePlayClick = () => {
     if (!isMinted) {
@@ -65,34 +133,100 @@ export default function Home() {
     setIsMinted(true);
   };
 
+  // Add this helper function to correctly get the wallet address
+  const getWalletAddress = () => {
+    if (!wallet) return null;
+    
+    console.log("Getting wallet address, wallet:", wallet);
+    
+    // For Phantom wallet
+    if (wallet.getAccount) {
+      try {
+        const account = wallet.getAccount();
+        console.log("Wallet account:", account);
+        return account?.address;
+      } catch (e) {
+        console.error("Error getting account:", e);
+      }
+    }
+    
+    // Try other methods if the above fails
+    if (typeof wallet.address === 'string') {
+      return wallet.address;
+    }
+    
+    if (wallet.account?.address) {
+      return wallet.account.address;
+    }
+    
+    console.log("Could not get wallet address");
+    return null;
+  }
+
+  // Update the loading state to stay within iPhone frame
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+        <div className="relative mx-auto bg-black rounded-[60px] h-[860px] w-[420px] shadow-xl overflow-hidden border-[14px] border-black">
+          {/* Phone notch */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[150px] h-[30px] bg-black rounded-b-[20px] z-50"></div>
+          
+          {/* Loading content */}
+          <div className="relative w-full h-full bg-[#6d5ceb] flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <div className="text-white text-xl font-bold">Loading wallet...</div>
+            </div>
+          </div>
+          
+          {/* Home indicator */}
+          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-[120px] h-[5px] bg-white rounded-full"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       {/* Phone frame */}
       <div className="relative mx-auto bg-black rounded-[60px] h-[860px] w-[420px] shadow-xl overflow-hidden border-[14px] border-black">
-        {/* Phone notch */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[150px] h-[30px] bg-black rounded-b-[20px] z-50"></div>
+        {/* Dynamic Island */}
+        <div className="absolute top-[12px] left-1/2 transform -translate-x-1/2 w-[120px] h-[35px] bg-black rounded-[20px] z-50 flex items-center justify-center">
+          {/* Camera/sensor dot */}
+          <div className="absolute right-[24px] w-[8px] h-[8px] rounded-full bg-[#1a1a1a]"></div>
+        </div>
 
-        {/* Side buttons */}
-        <div className="absolute top-[120px] left-[-14px] h-[80px] w-[4px] bg-gray-700 rounded-l-lg"></div>
-        <div className="absolute top-[220px] left-[-14px] h-[80px] w-[4px] bg-gray-700 rounded-l-lg"></div>
-        <div className="absolute top-[180px] right-[-14px] h-[100px] w-[4px] bg-gray-700 rounded-r-lg"></div>
-
-        {/* Status bar with wallet status */}
-        <div className="absolute top-0 left-0 right-0 h-[40px] bg-[#5d4ed3] flex items-center justify-between px-8 z-10">
+        {/* Status bar - move it slightly down to account for Dynamic Island */}
+        <div className="absolute top-[8px] left-0 right-0 h-[44px] bg-transparent flex items-center justify-between px-8 z-[45]">
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${address ? 'bg-green-400' : 'bg-red-400'}`}></div>
-            <div className="text-white text-xs">
-              {address ? 'Connected' : 'Disconnected'}
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
+            <div className="text-white text-xs truncate max-w-[150px]">
+              {(() => {
+                const address = getWalletAddress();
+                if (address) {
+                  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+                }
+                return "Not Connected";
+              })()}
             </div>
           </div>
-          {address && (
-            <button 
-              onClick={() => disconnect()}
-              className="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded-md transition-colors"
-            >
-              Disconnect
-            </button>
-          )}
+          
+          <button 
+            onClick={() => {
+              if (isConnected) {
+                handleDisconnect();
+              } else {
+                window.location.href = '/wallet-connect';
+              }
+            }}
+            className={`${
+              isConnected 
+                ? 'bg-red-500 hover:bg-red-600' 
+                : 'bg-[#4CAF50] hover:bg-[#45a049]'
+            } text-white text-xs px-3 py-1 rounded-md transition-colors`}
+          >
+            {isConnected ? 'Disconnect' : 'Connect Wallet'}
+          </button>
         </div>
 
         {/* Actual app content */}
