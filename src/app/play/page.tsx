@@ -3,11 +3,17 @@ import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation';
+import { useActiveAccount, useWalletBalance } from "thirdweb/react";
+import { ethers } from "ethers";
+import abi from "../mint/abi.json";
 
 export default function PlayScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isMinted = searchParams.get('minted') === 'true';
+
+  const account = useActiveAccount();
+
 
   const handlePlayClick = () => {
     if (!isMinted) {
@@ -22,6 +28,62 @@ export default function PlayScreen() {
       return;
     }
     window.location.href = 'https://abdullahs17053.itch.io/vibehit';
+  };
+
+  const handleCheckNFT = async () => {
+    console.log("check nft");
+
+    const address = account?.address;
+
+    console.log("address", address);
+
+    if (!address) {
+      toast.error('You have to connect your wallet before start playing', {
+        style: {
+          background: '#FF3B3B',
+          color: '#fff',
+          fontWeight: 'bold',
+        },
+        duration: 2000,
+      });
+      return;
+    }
+
+    if (address) {
+      console.log("address", address);
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contractInstance = new ethers.Contract(
+        "0xa52bfb7BbA6e40a2F0Bc1177787D58bA915bB5aA",
+        abi,
+        provider
+      );
+
+      const balance = await contractInstance.balanceOf(address);
+      console.log("NFT balance:", balance.toString());
+
+      if (balance > 0) {
+        toast.success('You have NFT', {
+          style: {
+            background: '#A4D555',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 2000,
+        });
+      } else {
+        toast.error('You do not have NFT, Level Up to get it', {
+          style: {
+            background: '#FF3B3B',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 2000,
+        });
+      }
+    }
+
+    // router.push('/mint');
   };
 
   return (
@@ -119,7 +181,7 @@ export default function PlayScreen() {
                   </div>
                 )}
               </button>
-              <button className="bg-[#A4D555] text-white text-2xl font-black py-5 rounded-[30px] shadow-[0_6px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#7BA140] active:translate-y-[4px] active:shadow-[0_2px_0px_#7BA140] transition-all duration-150">
+              <button onClick={handleCheckNFT} className="bg-[#A4D555] text-white text-2xl font-black py-5 rounded-[30px] shadow-[0_6px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#7BA140] active:translate-y-[4px] active:shadow-[0_2px_0px_#7BA140] transition-all duration-150">
                 CHECK NFT
               </button>
               <p className="text-[#a89bf3] text-3xl font-bold mt-auto mb-24 text-center">

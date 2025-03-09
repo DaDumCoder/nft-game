@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import toast from 'react-hot-toast';
 import iPhoneFrame from "@/components/iPhoneFrame";
 
-// At the top of your component, add these fixed positions
 const GEM_POSITIONS = [
   { x: 77, y: 115 },
   { x: 147, y: 541 },
@@ -17,10 +16,8 @@ const GEM_POSITIONS = [
 ];
 
 export default function Home() {
-  // Add loading state
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  // State for sound toggle and settings/info modals
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -32,7 +29,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-      router.replace('/wallet-connect'); // Using replace to avoid showing other screens
+      router.replace('/wallet-connect');
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -41,19 +38,14 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-        {/* Phone frame */}
         <div className="relative mx-auto bg-black rounded-[60px] h-[860px] w-[420px] shadow-xl overflow-hidden border-[14px] border-black">
-          {/* Phone notch */}
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[150px] h-[30px] bg-black rounded-b-[20px] z-50"></div>
           
-          {/* Side buttons */}
           <div className="absolute top-[120px] left-[-14px] h-[80px] w-[4px] bg-gray-700 rounded-l-lg"></div>
           <div className="absolute top-[220px] left-[-14px] h-[80px] w-[4px] bg-gray-700 rounded-l-lg"></div>
           <div className="absolute top-[180px] right-[-14px] h-[100px] w-[4px] bg-gray-700 rounded-r-lg"></div>
 
-          {/* Splash screen content */}
           <div className="h-full w-full flex flex-col items-center justify-center bg-[#7B61FF] relative overflow-hidden">
-            {/* Animated background gems */}
             <motion.div 
               className="absolute inset-0"
               initial={{ opacity: 0 }}
@@ -93,9 +85,7 @@ export default function Home() {
               ))}
             </motion.div>
 
-            {/* Main logo and gem */}
             <div className="relative z-10 flex flex-col items-center">
-              {/* Animated main gem */}
               <motion.div
                 initial={{ scale: 0, y: 50 }}
                 animate={{ scale: 1, y: 0 }}
@@ -116,7 +106,6 @@ export default function Home() {
                 />
               </motion.div>
 
-              {/* Animated title */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -143,7 +132,6 @@ export default function Home() {
                 </h1>
               </motion.div>
 
-              {/* Loading indicator */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -165,7 +153,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Home indicator */}
           <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-[120px] h-[5px] bg-white rounded-full"></div>
         </div>
       </div>
@@ -189,7 +176,6 @@ export default function Home() {
     window.location.href = 'https://abdullahs17053.itch.io/vibehit';
   };
 
-  // Sound toggle handler
   const handleSoundToggle = () => {
     setIsSoundOn(!isSoundOn);
   };
@@ -210,7 +196,6 @@ export default function Home() {
     setIsMinted(true);
   };
 
-  // Status bar content - simplified for splash screen
   const statusBarContent = (
     <>
       <div className="flex items-center gap-2">
@@ -224,17 +209,14 @@ export default function Home() {
     </>
   );
 
-  // Main content for the splash screen
   const splashContent = (
     <div className="h-full w-full flex flex-col items-center justify-center">
-      {/* Background glow effect */}
       <div className="absolute inset-0 bg-gradient-radial from-[#8662FF]/30 to-transparent opacity-70" />
       
-      {/* Logo and app name */}
       <div className="relative flex flex-col items-center z-10">
         <div className="mb-4">
           <Image
-            src="/Group 106.svg" // Using the gem icon from the mint page
+            src="/Group 106.svg" 
             alt="VibeHit Logo"
             width={150}
             height={150}
@@ -261,7 +243,6 @@ export default function Home() {
           PLAY & EARN WITH VIBES
         </p>
         
-        {/* Loading indicator */}
         {loading ? (
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
@@ -278,7 +259,6 @@ export default function Home() {
         )}
       </div>
       
-      {/* Vector background similar to mint page */}
       <div className="absolute left-0 right-0 bottom-40 flex justify-center">
         <Image
           src="/Vector 9.svg"

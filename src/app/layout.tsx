@@ -8,7 +8,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
-// Load Digitalt font
 const digitalt = localFont({
   src: './Digitalt.ttf',
   variable: '--font-digitalt',
