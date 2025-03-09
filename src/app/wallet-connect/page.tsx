@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 export default function WalletConnect() {
   const router = useRouter();
-  const wallet = useActiveWallet(client);
+  const wallet = useActiveWallet();
 
   useEffect(() => {
     if (wallet) {
@@ -45,6 +45,7 @@ export default function WalletConnect() {
               <p className="text-white text-lg mb-4">CONNECT YOUR WALLET</p>
               <div className="w-full bg-[#6d5ceb]/20 hover:bg-[#6d5ceb]/30 backdrop-blur-sm text-white rounded-xl p-4">
                 <ConnectButton 
+                  key="connect-button"
                   client={client}
                   onConnect={() => {
                     console.log("Wallet connected, redirecting...");
