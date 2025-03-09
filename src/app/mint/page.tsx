@@ -433,6 +433,19 @@ export default function Home() {
       setIsMinted(true);
       setClaimInProgress(false);
 
+      setTimeout(() => {
+        toast.success("Transaction approved! You can now claim your NFT", {
+          icon: '✅',
+          style: {
+            borderRadius: '10px',
+            background: '#3b82f6',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 3000,
+        });
+       }, 2000);
+
     } catch (error) {
       console.error("Error in approve transaction:", error);
       toast.error("Failed to approve NFT", {
@@ -447,22 +460,7 @@ export default function Home() {
 
 
 
-    try {
-      setTimeout(() => {
-        toast.success("Transaction approved! You can now claim your NFT", {
-          icon: '✅',
-          style: {
-            borderRadius: '10px',
-            background: '#3b82f6',
-            color: '#fff',
-            fontWeight: 'bold',
-          },
-          duration: 3000,
-        });
-       }, 2000);
-    } catch (error) {
-      console.log("Error sending transaction:", error);
-    }
+ 
   };
 
   const getWalletAddress = () => {
