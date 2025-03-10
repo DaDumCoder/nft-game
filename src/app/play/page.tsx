@@ -144,21 +144,21 @@ function PlayContent() {
           {/* Main content */}
           <div className="flex-1 flex flex-col items-center pt-32 px-6">
             {/* VIBE title */}
-            <h1 className="text-[#FFE17B] text-7xl font-semibold mb-2" style={{
+            <h1 className="text-[#FFE17B] text-7xl font-medium mb-2" style={{
               textShadow: "4px 4px 0px rgba(0, 0, 0, 0.25)"
             }}>
               VIBE
             </h1>
 
             {/* HIT title */}
-            <h1 className="text-[#8662FF] text-8xl font-semibold -mt-4 mb-8" style={{
+            <h1 className="text-[#8662FF] text-8xl font-medium -mt-4 mb-8" style={{
               textShadow: "4px 4px 0px rgba(0, 0, 0, 0.25)"
             }}>
               HIT
             </h1>
 
             {/* Subtitle */}
-            <p className="text-white text-2xl font-medium text-center mb-20" style={{
+            <p className="text-white text-2xl font-normal text-center mb-20" style={{
               textShadow: "2px 2px 0px rgba(0, 0, 0, 0.25)"
             }}>
               CLAIM ALL MISSION NFT'S
@@ -170,7 +170,7 @@ function PlayContent() {
             <div className="flex flex-col gap-6 w-full max-w-[320px]">
               <button 
                 onClick={handlePlayClick}
-                className={`relative bg-[#A4D555] text-white text-2xl font-semibold py-5 rounded-[30px] shadow-[0_6px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#7BA140] active:translate-y-[4px] active:shadow-[0_2px_0px_#7BA140] transition-all duration-150 ${!isMinted ? 'opacity-80' : ''}`}
+                className={`relative bg-[#A4D555] text-white text-2xl font-medium py-4 rounded-[30px] shadow-[0_4px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_3px_0px_#7BA140] active:translate-y-[3px] active:shadow-[0_1px_0px_#7BA140] transition-all duration-150 ${!isMinted ? 'opacity-80' : ''}`}
               >
                 START GAME
                 {!isMinted && (
@@ -182,10 +182,10 @@ function PlayContent() {
                   </div>
                 )}
               </button>
-              <button onClick={handleCheckNFT} className="bg-[#A4D555] text-white text-2xl font-semibold py-5 rounded-[30px] shadow-[0_6px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#7BA140] active:translate-y-[4px] active:shadow-[0_2px_0px_#7BA140] transition-all duration-150">
+              <button onClick={handleCheckNFT} className="bg-[#A4D555] text-white text-2xl font-medium py-4 rounded-[30px] shadow-[0_4px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_3px_0px_#7BA140] active:translate-y-[3px] active:shadow-[0_1px_0px_#7BA140] transition-all duration-150">
                 CHECK NFT
               </button>
-              <p className="text-[#a89bf3] text-3xl font-medium mt-auto mb-24 text-center">
+              <p className="text-[#a89bf3] text-3xl font-normal mt-auto mb-24 text-center">
                 STEP 2...
               </p>
             </div>

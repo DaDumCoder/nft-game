@@ -861,7 +861,7 @@ export default function Home() {
 
                 <div className="bg-[#21272e] pl-6 pr-4 py-[3px] rounded-[12px] flex items-center">
                   <span
-                    className="text-white text-2xl font-bold tracking-wider text-right min-w-[5px] justify-end flex"
+                    className="text-white text-2xl font-medium tracking-wider text-right min-w-[5px] justify-end flex"
                     style={{
                       textShadow: "2px 2px 0px rgba(0, 0, 0, 0.25)",
                     }}
@@ -892,7 +892,7 @@ export default function Home() {
 
               {!isMinted && (
                 <h1
-                  className="text-6xl font-semibold text-white tracking-wide mb-1 relative z-10"
+                  className="text-6xl font-medium text-white tracking-wide mb-1 relative z-10"
                   style={{
                     textShadow: "3px 3px 0 #b64a8a, 6px 6px 0 #21272e",
                     fontFamily: "Digitalt, sans-serif",
@@ -903,7 +903,7 @@ export default function Home() {
               )}
 
               <p
-                className="text-white text-xl font-medium text-center mb-3 relative z-10"
+                className="text-white text-xl font-normal text-center mb-3 relative z-10"
                 style={{
                   textShadow: "2px 2px 0 #b64a8a",
                 }}
@@ -947,7 +947,7 @@ export default function Home() {
         />
 
               <p
-                className="text-white font-medium text-3xl text-center mt-2 px-4"
+                className="text-white font-normal text-3xl text-center mt-2 px-4"
                 style={{
                   textShadow: "2px 2px 0 #b64a8a",
                 }}
@@ -956,7 +956,7 @@ export default function Home() {
                 <br />
               </p>
 
-              <p className="text-[#a89bf3] text-3xl font-medium mt-2">
+              <p className="text-[#a89bf3] text-3xl font-normal mt-2">
                 {isMinted ? 'STEP 1...' : 'STEP 1...'}
               </p>
             </div>
