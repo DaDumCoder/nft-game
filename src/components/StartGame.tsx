@@ -18,6 +18,9 @@ interface StartGameProps {
 const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, count, txHash, nftTokenId, getOpenSeaURL, MIN_COUNT, MAX_COUNT }: StartGameProps) => {
     const router = useRouter();
 
+    console.log(txHash, nftTokenId,getOpenSeaURL);
+    
+
   return (
     <div className="bg-white rounded-2xl w-full h-[250px] -top-2 max-w-[340px] p-6 pb-12 relative z-10">
     <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-72">
