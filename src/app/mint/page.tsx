@@ -16,8 +16,7 @@ import {
   TransactionButton
 } from "thirdweb/react";
 import { client } from "@/client";
-import { defineChain, getContract, toEther, readContract } from "thirdweb";
-import { base, baseSepolia } from "thirdweb/chains";
+import { defineChain, getContract, toEther } from "thirdweb";
 import { 
   claimTo, 
   getActiveClaimCondition, 
@@ -25,11 +24,11 @@ import {
   nextTokenIdToMint
 } from "thirdweb/extensions/erc721";
 import { useSendTransaction } from "thirdweb/react";
-import { prepareContractCall } from "thirdweb";
 import { ethers } from "ethers";
-
+import { getPrice } from "./utils";
 import abi from "./abi.json";
-
+import Loading from "@/components/Loading";
+import SuccessBanner from "@/components/SuccessBanner";
 
 export default function Home() {
   const [isSoundOn, setIsSoundOn] = useState(true);
@@ -271,70 +270,9 @@ export default function Home() {
     }
   };
 
-  const getPrice = (quantity: number) => {
-    if (!claimCondition || !claimCondition.pricePerToken) return "0";
-    const total = quantity * parseInt(claimCondition?.pricePerToken?.toString() || "0");
-    return toEther(BigInt(total));
-  };
-
-  const verifyContractAndMint = async (transactionHash: string) => {
-    console.log("======= VERIFICATION PROCESS STARTED =======");
-    console.log("Transaction hash:", transactionHash);
-    console.log("Contract address:", contract.address);
-    console.log("Account address:", account?.address);
-    console.log("Contract object:", JSON.stringify(contract, (key, value) => 
-      typeof value === 'bigint' ? value.toString() : value, 2));
-    console.log("Chain ID:", chain.id);
-    
-    try {
-      console.log("Bypassing contractURI checks due to AbiDecodingZeroDataError");
-      
-      console.log("Attempting to verify contract exists...");
-      
-      toast.success(`NFT minted successfully on ${chain.name}! 🎉`, {
-        icon: '✅',
-        style: {
-          borderRadius: '10px',
-          background: '#22c55e',
-          color: '#fff',
-          fontWeight: 'bold',
-        },
-        duration: 5000,
-      });
-      
-      setTxHistory(prev => {
-        const updated = [...prev];
-        const claimTx = updated.find(tx => tx.type === 'CLAIM');
-        if (claimTx) {
-          claimTx.status = 'COMPLETED';
-          claimTx.hash = transactionHash;
-        }
-        return updated;
-      });
-      
-      console.log("======= VERIFICATION PROCESS COMPLETED SUCCESSFULLY =======");
-      return "Verification simulated successfully";
-    } catch (error) {
-      console.error("Verification error:", error);
-      
-      toast.success(`NFT minted successfully on ${chain.name}! 🎉`, {
-        icon: '✅',
-        style: {
-          borderRadius: '10px',
-          background: '#22c55e',
-          color: '#fff',
-          fontWeight: 'bold',
-        },
-        duration: 5000,
-      });
-      
-      console.log("======= VERIFICATION PROCESS COMPLETED WITH OVERRIDE =======");
-      return null;
-    }
-  };
 
 
-  
+
   const handleMint = async () => {
     if (!account) {
       toast.error("Please connect your wallet first");
@@ -498,28 +436,11 @@ export default function Home() {
     return null;
   }
 
-  // useEffect(() => {
-  //   if (address) {
-  //     checkBalance(address);
-  //   }
-  // }, [address]);
+
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-        <div className="relative mx-auto bg-black rounded-[60px] h-[860px] w-[420px] shadow-xl overflow-hidden border-[14px] border-black">
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[150px] h-[30px] bg-black rounded-b-[20px] z-50"></div>
-          
-          <div className="relative w-full h-full bg-[#6d5ceb] flex items-center justify-center">
-            <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-              <div className="text-white text-xl font-bold">Loading wallet...</div>
-            </div>
-          </div>
-          
-          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-[120px] h-[5px] bg-white rounded-full"></div>
-        </div>
-      </div>
+    <Loading />
     );
   }
 
@@ -647,7 +568,7 @@ export default function Home() {
                       rel="noopener noreferrer"
                       className="flex items-center hover:underline"
                     >
-                      <span>View on BaseScan</span>
+                      <span>View on Soneium Scan</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
@@ -728,7 +649,7 @@ export default function Home() {
                   Claiming...
                 </>
               ) : (
-                <>Claim NFT (${getPrice(count)} ETH)</>
+                <>Claim NFT (${getPrice(count, claimCondition)} ETH)</>
               )}
             </TransactionButton>
           ) : (
@@ -792,41 +713,7 @@ export default function Home() {
   );
 
   const successBanner = isMinted && (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center items-center p-2 bg-green-500">
-      <div className="flex items-center justify-between w-full max-w-md px-2">
-        <div className="flex items-center">
-          <span className="text-white font-bold mr-2">✅ NFT SUCCESSFULLY MINTED!</span>
-        </div>
-        <div className="flex gap-3">
-          {txHash && (
-            <a 
-              href={`https://sepolia.basescanWallet account:.org/tx/${txHash}`}
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-white text-xs font-bold underline flex items-center hover:text-white/80"
-            >
-              <span>VIEW TX</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-          )}
-          {nftTokenId && (
-            <a 
-              href={getOpenSeaURL(nftTokenId)}
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-white text-xs font-bold underline flex items-center hover:text-white/80"
-            >
-              <span>OPENSEA</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-          )}
-        </div>
-      </div>
-    </div>
+ <SuccessBanner txHash={txHash || "" } nftTokenId={nftTokenId || ""} />
   );
 
   return (
