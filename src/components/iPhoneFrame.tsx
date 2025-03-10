@@ -7,7 +7,7 @@ interface iPhoneFrameProps {
   backgroundClassName?: string;
 }
 
-export default function iPhoneFrame({ 
+export default function IPhoneFrame({ 
   children, 
   statusBarContent, 
   bottomNavContent,

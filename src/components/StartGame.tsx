@@ -2,8 +2,20 @@ import Image from 'next/image';
 import React from 'react'
 import { useRouter } from 'next/navigation';
 
+interface StartGameProps {
+  isMinted: boolean;
+  handleMint: () => void;
+  handleIncrement: () => void;
+  handleDecrement: () => void;
+  count: number;
+  txHash?: string;
+  nftTokenId?: string;
+  getOpenSeaURL: (tokenId: string) => string;
+  MIN_COUNT: number;
+  MAX_COUNT: number;
+}
 
-const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, count, txHash, nftTokenId, getOpenSeaURL, MIN_COUNT, MAX_COUNT }: any) => {
+const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, count, txHash, nftTokenId, getOpenSeaURL, MIN_COUNT, MAX_COUNT }: StartGameProps) => {
     const router = useRouter();
 
   return (

@@ -3,7 +3,6 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { Toaster } from 'react-hot-toast';
 import { ThirdwebProvider } from "thirdweb/react";
-import { client } from "@/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -24,7 +23,7 @@ export default function RootLayout({
     <html lang="en" className={digitalt.className}>
       <body suppressHydrationWarning={true} className={digitalt.className}>
         <QueryClientProvider client={queryClient}>
-          <ThirdwebProvider client={client}>
+          <ThirdwebProvider >
             {children}
             <Toaster position="top-center" />
           </ThirdwebProvider>

@@ -3,8 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { motion } from "framer-motion";
-import toast from 'react-hot-toast';
-import iPhoneFrame from "@/components/iPhoneFrame";
+import IPhoneFrame  from "@/components/iPhoneFrame";
 
 const GEM_POSITIONS = [
   { x: 77, y: 115 },
@@ -18,13 +17,7 @@ const GEM_POSITIONS = [
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const [isSoundOn, setIsSoundOn] = useState(true);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showInfo, setShowInfo] = useState(false);
-  const [count, setCount] = useState(10);
-  const MIN_COUNT = 1;
-  const MAX_COUNT = 100;
-  const [isMinted, setIsMinted] = useState(false);
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -159,42 +152,42 @@ export default function Home() {
     );
   }
 
-  const handlePlayClick = () => {
-    if (!isMinted) {
-      toast('You have to mint before start playing', {
-        icon: '❌',
-        style: {
-          borderRadius: '10px',
-          background: '#FF3B3B',
-          color: '#fff',
-          fontWeight: 'bold',
-        },
-        duration: 2000,
-      });
-      return;
-    }
-    window.location.href = 'https://abdullahs17053.itch.io/vibehit';
-  };
+  // const handlePlayClick = () => {
+  //   if (!isMinted) {
+  //     toast('You have to mint before start playing', {
+  //       icon: '❌',
+  //       style: {
+  //         borderRadius: '10px',
+  //         background: '#FF3B3B',
+  //         color: '#fff',
+  //         fontWeight: 'bold',
+  //       },
+  //       duration: 2000,
+  //     });
+  //     return;
+  //   }
+  //   window.location.href = 'https://play.metakraft.live/Build/';
+  // };
 
-  const handleSoundToggle = () => {
-    setIsSoundOn(!isSoundOn);
-  };
+  // const handleSoundToggle = () => {
+  //   setIsSoundOn(!isSoundOn);
+  // };
 
-  const handleIncrement = () => {
-    if (count < MAX_COUNT) {
-      setCount(count + 1);
-    }
-  };
+  // const handleIncrement = () => {
+  //   if (count < MAX_COUNT) {
+  //     setCount(count + 1);
+  //   }
+  // };
 
-  const handleDecrement = () => {
-    if (count > MIN_COUNT) {
-      setCount(count - 1);
-    }
-  };
+  // const handleDecrement = () => {
+  //   if (count > MIN_COUNT) {
+  //     setCount(count - 1);
+  //   }
+  // };
 
-  const handleMint = () => {
-    setIsMinted(true);
-  };
+  // const handleMint = () => {
+  //   setIsMinted(true);
+  // };
 
   const statusBarContent = (
     <>
@@ -273,11 +266,11 @@ export default function Home() {
   );
 
   return (
-    <iPhoneFrame
+    <IPhoneFrame
       statusBarContent={statusBarContent}
       backgroundClassName="bg-[#6d5ceb]"
     >
       {splashContent}
-    </iPhoneFrame>
+    </IPhoneFrame>
   );
 }

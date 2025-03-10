@@ -1,31 +1,39 @@
 declare global {
   interface Window {
-    ethereum?: any;
+    ethereum: {
+      isMetaMask?: boolean;
+      request: (request: { method: string; params?: Array<unknown> }) => Promise<unknown>;
+      on: (event: string, callback: (...args: unknown[]) => void) => void;
+      removeListener: (event: string, callback: (...args: unknown[]) => void) => void;
+      selectedAddress?: string;
+      chainId?: string;
+      networkVersion?: string;
+      isConnected?: () => boolean;
+      enable: () => Promise<string[]>;
+    };
   }
 }
 
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 "use client";
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { 
   useActiveWallet, 
-  useActiveAccount,
-  useReadContract,
-  TransactionButton
+  useActiveAccount
 } from "thirdweb/react";
 import { client } from "@/client";
-import { defineChain, getContract, toEther } from "thirdweb";
+import { defineChain, getContract } from "thirdweb";
 import { 
-  claimTo, 
+
   getActiveClaimCondition, 
   getTotalClaimedSupply, 
   nextTokenIdToMint
 } from "thirdweb/extensions/erc721";
-import { useSendTransaction } from "thirdweb/react";
 import { ethers } from "ethers";
-import { getPrice } from "./utils";
 import abi from "./abi.json";
 import Loading from "@/components/Loading";
 import SuccessBanner from "@/components/SuccessBanner";
@@ -43,20 +51,17 @@ export default function Home() {
   const [isMinted, setIsMinted] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isApproved, setIsApproved] = useState(false);
+  // const [isApproved, setIsApproved] = useState(false);
   const [approvalInProgress, setApprovalInProgress] = useState(false);
   const [claimInProgress, setClaimInProgress] = useState(false);
-  const [contractMetadata, setContractMetadata] = useState<any>(null);
-  const [claimCondition, setClaimCondition] = useState<any>(null);
-  const [claimedSupply, setClaimedSupply] = useState<bigint | null>(null);
-  const [totalNFTSupply, setTotalNFTSupply] = useState<bigint | null>(null);
-  const [txHistory, setTxHistory] = useState<Array<{type: string, status: string, timestamp: number, hash?: string}>>([]);
+  // const [contractMetadata, setContractMetadata] = useState({});
+  // const [claimCondition, setClaimCondition] = useState(null);
+  // const [claimedSupply, setClaimedSupply] = useState<bigint | null>(null);
+  // const [totalNFTSupply, setTotalNFTSupply] = useState<bigint | null>(null);
+  // const [txHistory, setTxHistory] = useState<Array<{type: string, status: string, timestamp: number, hash?: string}>>([]);
   const [nftTokenId, setNftTokenId] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
-  const [contractError, setContractError] = useState<string | null>(null);
-  const { mutate: sendTransaction } = useSendTransaction();
   // const [address, setAddress] = useState<any>(null);
-  const router = useRouter();
   const wallet = useActiveWallet();
   const account = useActiveAccount();
   const chain = defineChain({
@@ -79,7 +84,7 @@ export default function Home() {
   });
 
   const contractDataFetched = useRef(false);
-  const [verificationLink, setVerificationLink] = useState<string | null>(null);
+  // const [verificationLink, setVerificationLink] = useState<string | null>(null);
 
   useEffect(() => {
     if (contractDataFetched.current) return;
@@ -92,28 +97,27 @@ export default function Home() {
           console.log("Fetching contract data, contract:", contract);
           console.log("Active account:", account);
           
-          const defaultMetadata = { 
-            name: "VIBEHIT NFT",
-            description: "Exclusive NFT for the VIBEHIT Game", 
-            image: "/Group 106.svg"
-          };
+          // const defaultMetadata = { 
+          //   name: "VIBEHIT NFT",
+          //   description: "Exclusive NFT for the VIBEHIT Game", 
+          //   image: "/Group 106.svg"
+          // };
           
-          setContractMetadata(defaultMetadata);
+      //    setContractMetadata(defaultMetadata);
           
           try {
             const claimCond = await getActiveClaimCondition({ contract });
-            setClaimCondition(claimCond);
+            // setClaimCondition(claimCond);
             console.log("Claim condition:", claimCond);
           } catch (error) {
             console.error("Error fetching claim condition:", error);
-            setContractError("Failed to fetch claim condition");
           }
           
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           try {
             const claimed = await getTotalClaimedSupply({ contract });
-            setClaimedSupply(claimed);
+            // setClaimedSupply(claimed);
             console.log("Claimed supply:", claimed);
           } catch (error) {
             console.error("Error fetching claimed supply:", error);
@@ -123,7 +127,8 @@ export default function Home() {
           
           try {
             const total = await nextTokenIdToMint({ contract });
-            setTotalNFTSupply(total);
+            setNftTokenId(total.toString());
+            // setTotalNFTSupply(total);
             console.log("Total supply:", total);
           } catch (error) {
             console.error("Error fetching total supply:", error);
@@ -131,14 +136,13 @@ export default function Home() {
           
         } catch (error) {
           console.error("Error fetching contract data:", error);
-          setContractError("Failed to fetch NFT data. Using default values.");
           
-          const defaultMetadata = { 
-            name: "VIBEHIT NFT",
-            description: "Exclusive NFT for the VIBEHIT Game", 
-            image: "/Group 106.svg"
-          };
-          setContractMetadata(defaultMetadata);
+          // const defaultMetadata = { 
+          //   name: "VIBEHIT NFT",
+          //   description: "Exclusive NFT for the VIBEHIT Game", 
+          //   image: "/Group 106.svg"
+          // };
+    //      setContractMetadata(defaultMetadata);
         }
       }
     };
@@ -161,7 +165,7 @@ export default function Home() {
       console.log("Wallet properties:");
       try {
         for (const key in wallet) {
-          console.log(`${key}:`, wallet[key]);
+          console.log(`${key}:`, wallet[key as keyof typeof wallet]);
         }
         
         if (wallet.getAccount) {
@@ -254,7 +258,7 @@ export default function Home() {
       });
       return;
     }
-    window.location.href = 'https://abdullahs17053.itch.io/vibehit';
+    window.location.href = 'https://play.metakraft.live/Build/';
   };
 
   const handleSoundToggle = () => {
@@ -360,8 +364,8 @@ export default function Home() {
         );
 
         console.log("Approval transaction:", approvalTx);
-        await approvalTx.wait();
-        
+        const hash = await approvalTx.wait();
+        setTxHash(hash);
         toast.success("Token approval successful!", {
           icon: '✅',
           style: {
@@ -375,7 +379,7 @@ export default function Home() {
       }
 
       setApprovalInProgress(false);
-      setIsApproved(true);
+      // setIsApproved(true);
       setClaimInProgress(true);
 
       // Continue with minting
@@ -403,7 +407,9 @@ export default function Home() {
       );
 
       console.log("Claim transaction:", claimTx);
+
       const receipt = await claimTx.wait();
+      setTxHash(receipt.transactionHash);
       console.log("Transaction receipt:", receipt);
 
       setIsMinted(true);
@@ -441,30 +447,10 @@ export default function Home() {
     
     console.log("Getting wallet address, wallet:", wallet);
     
-    if (wallet.getAccount) {
-      try {
-        const account = wallet.getAccount();
-        console.log("Wallet account:", account);
-
-        console.log("address", account?.address);
-    
-        // checkBalance(account?.address || "");
-    
-        // setAddress(account?.address);
-
-        checkBalance(account?.address || "");
-        return account?.address;
-      } catch (e) {
-        console.error("Error getting account:", e);
-      }
-    }
-    
-    if (typeof wallet.address === 'string') {
-      return wallet.address;
-    }
-    
-    if (wallet.account?.address) {
-      return wallet.account.address;
+    if (account?.address) {
+      console.log("Using account address:", account.address);
+      checkBalance(account.address);
+      return account.address;
     }
     
     console.log("Could not get wallet address");
@@ -479,44 +465,44 @@ export default function Home() {
     );
   }
 
-  const txHistorySection = txHistory.length > 0 && (
-    <div className="w-full max-w-[280px] mt-6">
-      <h3 className="text-white font-medium mb-2 text-left">Transaction History:</h3>
-      <div className="bg-white/10 rounded-xl p-3">
-        {txHistory.map((tx, index) => (
-          <div key={index} className="mb-2 last:mb-0 flex justify-between items-center">
-            <div>
-              <span className="text-white/90 text-sm">{tx.type}</span>
-              <span className="text-white/60 text-xs ml-2">
-                {new Date(tx.timestamp).toLocaleTimeString()}
-              </span>
-            </div>
-            <div className="flex items-center">
-              <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                tx.status === 'COMPLETED' ? 'bg-green-500/20 text-green-300' : 
-                tx.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-300' :
-                'bg-red-500/20 text-red-300'
-              }`}>
-                {tx.status}
-              </span>
-              {tx.hash && (
-                <a 
-                  href={`https://sepolia.basescan.org/tx/${tx.hash}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="ml-2"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  // const txHistorySection = txHistory.length > 0 && (
+  //   <div className="w-full max-w-[280px] mt-6">
+  //     <h3 className="text-white font-medium mb-2 text-left">Transaction History:</h3>
+  //     <div className="bg-white/10 rounded-xl p-3">
+  //       {txHistory.map((tx, index) => (
+  //         <div key={index} className="mb-2 last:mb-0 flex justify-between items-center">
+  //           <div>
+  //             <span className="text-white/90 text-sm">{tx.type}</span>
+  //             <span className="text-white/60 text-xs ml-2">
+  //               {new Date(tx.timestamp).toLocaleTimeString()}
+  //             </span>
+  //           </div>
+  //           <div className="flex items-center">
+  //             <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+  //               tx.status === 'COMPLETED' ? 'bg-green-500/20 text-green-300' : 
+  //               tx.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-300' :
+  //               'bg-red-500/20 text-red-300'
+  //             }`}>
+  //               {tx.status}
+  //             </span>
+  //             {tx.hash && (
+  //               <a 
+  //                 href={`https://sepolia.basescan.org/tx/${tx.hash}`} 
+  //                 target="_blank" 
+  //                 rel="noopener noreferrer"
+  //                 className="ml-2"
+  //               >
+  //                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  //                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+  //                 </svg>
+  //               </a>
+  //             )}
+  //           </div>
+  //         </div>
+  //       ))}
+  //     </div>
+  //   </div>
+  // );
 
   const getOpenSeaURL = (tokenId: string | null) => {
     if (!tokenId) return "https://testnets.opensea.io/collection/base-sepolia";
@@ -524,228 +510,228 @@ export default function Home() {
     return `https://testnets.opensea.io/assets/base-sepolia/0xCb835bD252923114a87fac1fC8034692CEe867e3/${cleanTokenId}`;
   };
 
-  const mintContent = (
-    <div className="h-full w-full flex flex-col">
-      <div className="flex flex-col items-center my-4 p-4">
-        {contractError && (
-          <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4 w-full max-w-[280px]">
-            <p className="text-sm">{contractError}</p>
-            <p className="text-xs mt-1">Using fallback values. Mint functionality will still work.</p>
-          </div>
-        )}
+  // const mintContent = (
+  //   <div className="h-full w-full flex flex-col">
+  //     <div className="flex flex-col items-center my-4 p-4">
+  //       {contractError && (
+  //         <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4 w-full max-w-[280px]">
+  //           <p className="text-sm">{contractError}</p>
+  //           <p className="text-xs mt-1">Using fallback values. Mint functionality will still work.</p>
+  //         </div>
+  //       )}
         
-        {contractMetadata && contractMetadata.image && (
-          <Image
-            src={contractMetadata.image}
-            alt={contractMetadata.name || "NFT Image"}
-            width={128}
-            height={128}
-            className="rounded-xl mb-3"
-          />
-        )}
+  //       {contractMetadata && contractMetadata.image && (
+  //         <Image
+  //           src={contractMetadata.image}
+  //           alt={contractMetadata.name || "NFT Image"}
+  //           width={128}
+  //           height={128}
+  //           className="rounded-xl mb-3"
+  //         />
+  //       )}
         
-        <h2 className="text-xl font-bold text-white">
-          {contractMetadata?.name || "VIBE NFT"}
-        </h2>
+  //       <h2 className="text-xl font-bold text-white">
+  //         {contractMetadata?.name || "VIBE NFT"}
+  //       </h2>
         
-        <p className="text-sm text-white/80 text-center mt-1 mb-3">
-          {contractMetadata?.description || "Mint your exclusive VibeHit NFT"}
-        </p>
+  //       <p className="text-sm text-white/80 text-center mt-1 mb-3">
+  //         {contractMetadata?.description || "Mint your exclusive VibeHit NFT"}
+  //       </p>
 
-        {claimedSupply !== null && totalNFTSupply !== null ? (
-          <p className="text-sm font-medium text-white/90">
-            {claimedSupply.toString()}/{totalNFTSupply.toString()} Minted
-          </p>
-        ) : (
-          <p className="text-sm font-medium text-white/90">
-            ??/?? Minted
-          </p>
-        )}
+  //       {claimedSupply !== null && totalNFTSupply !== null ? (
+  //         <p className="text-sm font-medium text-white/90">
+  //           {claimedSupply.toString()}/{totalNFTSupply.toString()} Minted
+  //         </p>
+  //       ) : (
+  //         <p className="text-sm font-medium text-white/90">
+  //           ??/?? Minted
+  //         </p>
+  //       )}
         
-        <div className="flex items-center justify-center mt-3">
-          <button 
-            className="bg-white/10 hover:bg-white/15 text-white p-2 rounded-l-lg w-10 h-10 flex items-center justify-center"
-            onClick={handleDecrement}
-          >
-            -
-          </button>
-          <div className="bg-white/20 text-white p-2 w-12 h-10 flex items-center justify-center text-center">
-            {count}
-          </div>
-          <button 
-            className="bg-white/10 hover:bg-white/15 text-white p-2 rounded-r-lg w-10 h-10 flex items-center justify-center"
-            onClick={handleIncrement}
-          >
-            +
-          </button>
-        </div>
+  //       <div className="flex items-center justify-center mt-3">
+  //         <button 
+  //           className="bg-white/10 hover:bg-white/15 text-white p-2 rounded-l-lg w-10 h-10 flex items-center justify-center"
+  //           onClick={handleDecrement}
+  //         >
+  //           -
+  //         </button>
+  //         <div className="bg-white/20 text-white p-2 w-12 h-10 flex items-center justify-center text-center">
+  //           {count}
+  //         </div>
+  //         <button 
+  //           className="bg-white/10 hover:bg-white/15 text-white p-2 rounded-r-lg w-10 h-10 flex items-center justify-center"
+  //           onClick={handleIncrement}
+  //         >
+  //           +
+  //         </button>
+  //       </div>
         
-        <div className="mt-4 w-full max-w-[280px]">
-          {isMinted ? (
-            <>
-              <div className="bg-green-100 p-3 rounded-xl mb-4 border border-green-300">
-                <div className="flex items-center text-green-700 font-medium">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>NFT Successfully Minted!</span>
-                </div>
-                {nftTokenId && (
-                  <div className="text-sm text-green-600 mt-1">
-                    Token ID: {nftTokenId}
-                  </div>
-                )}
-                {txHash && (
-                  <div className="text-xs text-blue-600 mt-2">
-                    <a 
-                      href={verificationLink || `https://sepolia.basescan.org/tx/${txHash}`}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center hover:underline"
-                    >
-                      <span>View on Soneium Scan</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  </div>
-                )}
+  //       <div className="mt-4 w-full max-w-[280px]">
+  //         {isMinted ? (
+  //           <>
+  //             <div className="bg-green-100 p-3 rounded-xl mb-4 border border-green-300">
+  //               <div className="flex items-center text-green-700 font-medium">
+  //                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+  //                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+  //                 </svg>
+  //                 <span>NFT Successfully Minted!</span>
+  //               </div>
+  //               {nftTokenId && (
+  //                 <div className="text-sm text-green-600 mt-1">
+  //                   Token ID: {nftTokenId}
+  //                 </div>
+  //               )}
+  //               {txHash && (
+  //                 <div className="text-xs text-blue-600 mt-2">
+  //                   <a 
+  //                     href={verificationLink || `https://sepolia.basescan.org/tx/${txHash}`}
+  //                     target="_blank" 
+  //                     rel="noopener noreferrer"
+  //                     className="flex items-center hover:underline"
+  //                   >
+  //                     <span>View on Soneium Scan</span>
+  //                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  //                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+  //                     </svg>
+  //                   </a>
+  //                 </div>
+  //               )}
                 
-                <div className="text-xs text-blue-600 mt-2">
-                  <a 
-                    href={getOpenSeaURL(nftTokenId)}
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center hover:underline"
-                  >
-                    <span>View on OpenSea</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-              <button
-                className="w-full h-[52px] bg-green-500 text-white font-bold rounded-xl flex items-center justify-center gap-2"
-                onClick={handlePlayClick}
-              >
-                <Image src="/play.svg" width={20} height={20} alt="Play" />
-                Play Game
-              </button>
-            </>
-          ) : isApproved ? (
-            <TransactionButton
-              transaction={() => claimTo({
-                contract: contract,
-                to: account?.address as `0x${string}`,
-                quantity: BigInt(count),
-              })}
-              className="w-full h-[52px] bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl flex items-center justify-center disabled:opacity-70"
-              onTransactionConfirmed={async (result) => {
-                console.log("Transaction confirmed:", result);
-                setTxHash(result.transactionHash);
-                setIsMinted(true);
-                setClaimInProgress(false);
+  //               <div className="text-xs text-blue-600 mt-2">
+  //                 <a 
+  //                   href={getOpenSeaURL(nftTokenId)}
+  //                   target="_blank" 
+  //                   rel="noopener noreferrer"
+  //                   className="flex items-center hover:underline"
+  //                 >
+  //                   <span>View on OpenSea</span>
+  //                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  //                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+  //                   </svg>
+  //                 </a>
+  //               </div>
+  //             </div>
+  //             <button
+  //               className="w-full h-[52px] bg-green-500 text-white font-bold rounded-xl flex items-center justify-center gap-2"
+  //               onClick={handlePlayClick}
+  //             >
+  //               <Image src="/play.svg" width={20} height={20} alt="Play" />
+  //               Play Game
+  //             </button>
+  //           </>
+  //         ) : isApproved ? (
+  //           <TransactionButton
+  //             transaction={() => claimTo({
+  //               contract: contract,
+  //               to: account?.address as `0x${string}`,
+  //               quantity: BigInt(count),
+  //             })}
+  //             className="w-full h-[52px] bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl flex items-center justify-center disabled:opacity-70"
+  //             onTransactionConfirmed={async (result) => {
+  //               console.log("Transaction confirmed:", result);
+  //               setTxHash(result.transactionHash);
+  //               setIsMinted(true);
+  //               setClaimInProgress(false);
                 
-                const claimTx = {
-                  type: 'CLAIM', 
-                  status: 'COMPLETED', 
-                  timestamp: Date.now(),
-                  hash: result.transactionHash
-                };
-                setTxHistory(prev => [...prev, claimTx]);
+  //               const claimTx = {
+  //                 type: 'CLAIM', 
+  //                 status: 'COMPLETED', 
+  //                 timestamp: Date.now(),
+  //                 hash: result.transactionHash
+  //               };
+  //               setTxHistory(prev => [...prev, claimTx]);
                 
-                if (claimedSupply !== null) {
-                  const tokenId = (claimedSupply + BigInt(1)).toString();
-                  setNftTokenId(tokenId);
-                }
+  //               if (claimedSupply !== null) {
+  //                 const tokenId = (claimedSupply + BigInt(1)).toString();
+  //                 setNftTokenId(tokenId);
+  //               }
                 
-                toast.success("NFT successfully minted! 🎉", {
-                  icon: '✅',
-                  style: {
-                    borderRadius: '10px',
-                    background: '#22c55e',
-                    color: '#fff',
-                    fontWeight: 'bold',
-                  },
-                  duration: 5000,
-                });
+  //               toast.success("NFT successfully minted! 🎉", {
+  //                 icon: '✅',
+  //                 style: {
+  //                   borderRadius: '10px',
+  //                   background: '#22c55e',
+  //                   color: '#fff',
+  //                   fontWeight: 'bold',
+  //                 },
+  //                 duration: 5000,
+  //               });
                 
-              }}
-              onError={(error) => {
-                console.error("Claim error:", error);
-                setClaimInProgress(false);
-                toast.error(`Failed to claim NFT: ${error.message || "Unknown error"}`);
-              }}
-            >
-              {claimInProgress ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Claiming...
-                </>
-              ) : (
-                <>Claim NFT (${getPrice(count, claimCondition)} ETH)</>
-              )}
-            </TransactionButton>
-          ) : (
-            <button
-              className="w-full h-[52px] bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl flex items-center justify-center disabled:opacity-70"
-              onClick={() => {
-                setApprovalInProgress(true);
-                setTimeout(() => {
-                  setIsApproved(true);
-                  setApprovalInProgress(false);
+  //             }}
+  //             onError={(error) => {
+  //               console.error("Claim error:", error);
+  //               setClaimInProgress(false);
+  //               toast.error(`Failed to claim NFT: ${error.message || "Unknown error"}`);
+  //             }}
+  //           >
+  //             {claimInProgress ? (
+  //               <>
+  //                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+  //                 Claiming...
+  //               </>
+  //             ) : (
+  //               <>Claim NFT (${getPrice(count, claimCondition)} ETH)</>
+  //             )}
+  //           </TransactionButton>
+  //         ) : (
+  //           <button
+  //             className="w-full h-[52px] bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl flex items-center justify-center disabled:opacity-70"
+  //             onClick={() => {
+  //               setApprovalInProgress(true);
+  //               setTimeout(() => {
+  //                 setIsApproved(true);
+  //                 setApprovalInProgress(false);
                   
-                  const mockHash = `0x${Array.from({length: 64}, () => 
-                    Math.floor(Math.random() * 16).toString(16)).join('')}`;
+  //                 const mockHash = `0x${Array.from({length: 64}, () => 
+  //                   Math.floor(Math.random() * 16).toString(16)).join('')}`;
                   
-                  const approvalTx = {
-                    type: 'APPROVE', 
-                    status: 'COMPLETED', 
-                    timestamp: Date.now(),
-                    hash: mockHash
-                  };
-                  setTxHistory(prev => [...prev, approvalTx]);
+  //                 const approvalTx = {
+  //                   type: 'APPROVE', 
+  //                   status: 'COMPLETED', 
+  //                   timestamp: Date.now(),
+  //                   hash: mockHash
+  //                 };
+  //                 setTxHistory(prev => [...prev, approvalTx]);
                   
-                  toast.success("Transaction approved! You can now claim your NFT", {
-                    icon: '✅',
-                    style: {
-                      borderRadius: '10px',
-                      background: '#3b82f6',
-                      color: '#fff',
-                      fontWeight: 'bold',
-                    },
-                    duration: 3000,
-                  });
-                }, 2000);
-              }}
-              disabled={approvalInProgress}
-            >
-              {approvalInProgress ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Approving...
-                </>
-              ) : (
-                <>Approve Transaction</>
-              )}
-            </button>
-          )}
-        </div>
+  //                 toast.success("Transaction approved! You can now claim your NFT", {
+  //                   icon: '✅',
+  //                   style: {
+  //                     borderRadius: '10px',
+  //                     background: '#3b82f6',
+  //                     color: '#fff',
+  //                     fontWeight: 'bold',
+  //                   },
+  //                   duration: 3000,
+  //                 });
+  //               }, 2000);
+  //             }}
+  //             disabled={approvalInProgress}
+  //           >
+  //             {approvalInProgress ? (
+  //               <>
+  //                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+  //                 Approving...
+  //               </>
+  //             ) : (
+  //               <>Approve Transaction</>
+  //             )}
+  //           </button>
+  //         )}
+  //       </div>
         
-        {txHistorySection}
+  //       {txHistorySection}
 
-        {isMinted && (
-          <div className="absolute top-0 right-0 mt-2 mr-2">
-            <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-              NFT Minted ✓
-            </div>
-          </div>
-        )}
-      </div>
+  //       {isMinted && (
+  //         <div className="absolute top-0 right-0 mt-2 mr-2">
+  //           <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+  //             NFT Minted ✓
+  //           </div>
+  //         </div>
+  //       )}
+  //     </div>
 
-    </div>
-  );
+  //   </div>
+  // );
 
   const successBanner = isMinted && (
  <SuccessBanner txHash={txHash || "" } nftTokenId={nftTokenId || ""} />
@@ -947,7 +933,18 @@ export default function Home() {
                 />
               </div>
 
-        <StartGame isMinted={isMinted} handleMint={handleMint} handleIncrement={handleIncrement} handleDecrement={handleDecrement} count={count} txHash={txHash} nftTokenId={nftTokenId} getOpenSeaURL={getOpenSeaURL} MIN_COUNT={MIN_COUNT} MAX_COUNT={MAX_COUNT} />
+        <StartGame 
+          isMinted={isMinted} 
+          handleMint={handleMint} 
+          handleIncrement={handleIncrement} 
+          handleDecrement={handleDecrement} 
+          count={count} 
+          txHash={txHash || ""} 
+          nftTokenId={nftTokenId || ""} 
+          getOpenSeaURL={getOpenSeaURL} 
+          MIN_COUNT={MIN_COUNT} 
+          MAX_COUNT={MAX_COUNT} 
+        />
 
               <p
                 className="text-white font-bold text-3xl text-center mt-2 px-4"

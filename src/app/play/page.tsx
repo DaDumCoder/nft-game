@@ -3,11 +3,12 @@ import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'next/navigation';
-import { useActiveAccount, useWalletBalance } from "thirdweb/react";
+import { useActiveAccount } from "thirdweb/react";
 import { ethers } from "ethers";
 import abi from "../mint/abi.json";
+import { Suspense } from 'react';
 
-export default function PlayScreen() {
+function PlayContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isMinted = searchParams.get('minted') === 'true';
@@ -27,7 +28,7 @@ export default function PlayScreen() {
       });
       return;
     }
-    window.location.href = 'https://abdullahs17053.itch.io/vibehit';
+    window.location.href = 'https://play.metakraft.live/Build/';
   };
 
   const handleCheckNFT = async () => {
@@ -248,5 +249,13 @@ export default function PlayScreen() {
         <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-[120px] h-[5px] bg-white rounded-full"></div>
       </div>
     </div>
+  );
+}
+
+export default function PlayScreen() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PlayContent />
+    </Suspense>
   );
 } 

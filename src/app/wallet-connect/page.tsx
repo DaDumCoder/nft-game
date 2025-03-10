@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
 import { useRouter } from 'next/navigation';
 import { useActiveWallet } from "thirdweb/react";
