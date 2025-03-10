@@ -29,6 +29,9 @@ import { getPrice } from "./utils";
 import abi from "./abi.json";
 import Loading from "@/components/Loading";
 import SuccessBanner from "@/components/SuccessBanner";
+import Claim from "@/components/Claim";
+import StartGame from "@/components/StartGame";
+import { MintingLoader } from "@/components/mint/MintingLoader";
 
 export default function Home() {
   const [isSoundOn, setIsSoundOn] = useState(true);
@@ -279,88 +282,137 @@ export default function Home() {
       return;
     }
 
-    console.log("isApproved:", isApproved);
-
-    setIsApproved(true);
-
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-    console.log("provider", provider);
-  
-    //signer
-  
-    const signer = provider.getSigner()
-  
-    console.log("signer", signer);     
-    
-    const contractInstance = new ethers.Contract(
-        "0x1D98101247FB761c9aDC4e2EaD6aA6b6a00c170e",
-        abi,
-        provider
-      );
-    const contractInstanceToken = new ethers.Contract(
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      
+      const contractInstanceToken = new ethers.Contract(
         "0x2CAE934a1e84F693fbb78CA5ED3B0A6893259441",
         [
           {
+            "constant": true,
+            "inputs": [
+              { "name": "_owner", "type": "address" },
+              { "name": "_spender", "type": "address" }
+            ],
+            "name": "allowance",
+            "outputs": [{ "name": "", "type": "uint256" }],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "constant": true,
+            "inputs": [
+              { "name": "_owner", "type": "address" }
+            ],
+            "name": "balanceOf",
+            "outputs": [{ "name": "", "type": "uint256" }],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
             "constant": false,
             "inputs": [
-              {
-                "name": "_spender",
-                "type": "address"
-              },
-              {
-                "name": "_value",
-                "type": "uint256"
-              }
+              { "name": "_spender", "type": "address" },
+              { "name": "_value", "type": "uint256" }
             ],
             "name": "approve",
-            "outputs": [
-              {
-                "name": "",
-                "type": "bool"
-              }
-            ],
+            "outputs": [{ "name": "", "type": "bool" }],
             "payable": false,
-            "stateMutability": "nonpayable",
+            "stateMutability": "nonpayable", 
             "type": "function"
           }
         ],
         provider
       );
 
+      // Check token balance
+      const tokenBalance = await contractInstanceToken.balanceOf(account.address);
+      console.log("Token balance:", tokenBalance.toString());
+
+      if (tokenBalance.lt("34000000000000000000")) {
+        toast.error("Insufficient token balance. You need at least 34 ASTR to mint.", {
+          style: {
+            borderRadius: '10px',
+            background: '#ef4444',
+            color: '#fff', 
+            fontWeight: 'bold'
+          }
+        });
+        return;
+      }
+
+      // Check current allowance
+      const currentAllowance = await contractInstanceToken.allowance(
+        account.address,
+        "0x1D98101247FB761c9aDC4e2EaD6aA6b6a00c170e"
+      );
+
+      if (currentAllowance.lt("34000000000000000000")) {
+        setApprovalInProgress(true);
+        
+        const contractWithSignerToken = contractInstanceToken.connect(signer);
+        const approvalTx = await contractWithSignerToken.approve(
+          "0x1D98101247FB761c9aDC4e2EaD6aA6b6a00c170e",
+          "34000000000000000000"
+        );
+
+        console.log("Approval transaction:", approvalTx);
+        await approvalTx.wait();
+        
+        toast.success("Token approval successful!", {
+          icon: '✅',
+          style: {
+            borderRadius: '10px',
+            background: '#22c55e',
+            color: '#fff',
+            fontWeight: 'bold'
+          },
+          duration: 3000
+        });
+      }
+
+      setApprovalInProgress(false);
+      setIsApproved(true);
+      setClaimInProgress(true);
+
+      // Continue with minting
+      const contractInstance = new ethers.Contract(
+        "0x1D98101247FB761c9aDC4e2EaD6aA6b6a00c170e",
+        abi,
+        provider
+      );
+
       const contractWithSigner = contractInstance.connect(signer);
-
-      const contractWithSignerToken = contractInstanceToken.connect(signer);
-
-      const approvalTx = await contractWithSignerToken.approve("0x1D98101247FB761c9aDC4e2EaD6aA6b6a00c170e", "34000000000000000000");
-
-      console.log("Approval transaction:", approvalTx);
-
-      console.log("Calling claim function...");
+      
       const claimTx = await contractWithSigner.claim(
-        account?.address,
+        account.address,
         1,
-        "0x2CAE934a1e84F693fbb78CA5ED3B0A6893259441", 
+        "0x2CAE934a1e84F693fbb78CA5ED3B0A6893259441",
         BigInt("34000000000000000000"),
         [
           [],
           "0",
           "115792089237316195423570985008687907853269984665640564039457584007913129639935",
-          "0x0000000000000000000000000000000000000000" ]   ,
-               "0x",
-        {
-          gasLimit: 300000
-        }
+          "0x0000000000000000000000000000000000000000"
+        ],
+        "0x",
+        { gasLimit: 300000 }
       );
 
       console.log("Claim transaction:", claimTx);
       const receipt = await claimTx.wait();
       console.log("Transaction receipt:", receipt);
 
-      toast.success("NFT approved successfully!", {
+      setIsMinted(true);
+      setClaimInProgress(false);
+
+      toast.success("NFT minted successfully! 🎉", {
         icon: '✅',
         style: {
-          borderRadius: '10px', 
+          borderRadius: '10px',
           background: '#22c55e',
           color: '#fff',
           fontWeight: 'bold'
@@ -368,37 +420,20 @@ export default function Home() {
         duration: 3000
       });
 
-      setIsMinted(true);
-      setClaimInProgress(false);
-
-      setTimeout(() => {
-        toast.success("Transaction approved! You can now claim your NFT", {
-          icon: '✅',
-          style: {
-            borderRadius: '10px',
-            background: '#3b82f6',
-            color: '#fff',
-            fontWeight: 'bold',
-          },
-          duration: 3000,
-        });
-       }, 2000);
-
     } catch (error) {
-      console.error("Error in approve transaction:", error);
-      toast.error("Failed to approve NFT", {
+      console.error("Transaction error:", error);
+      setApprovalInProgress(false);
+      setClaimInProgress(false);
+      
+      toast.error("Transaction failed", {
         style: {
           borderRadius: '10px',
-          background: '#ef4444', 
+          background: '#ef4444',
           color: '#fff',
           fontWeight: 'bold'
         }
       });
     }
-
-
-
- 
   };
 
   const getWalletAddress = () => {
@@ -718,6 +753,10 @@ export default function Home() {
 
   return (
     <>
+      {(approvalInProgress || claimInProgress) && (
+        <MintingLoader isApproving={approvalInProgress} />
+      )}
+      
       {successBanner}
       
       <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -908,169 +947,7 @@ export default function Home() {
                 />
               </div>
 
-              <div className="bg-white rounded-2xl w-full h-[250px] -top-2 max-w-[340px] p-6 pb-12 relative z-10">
-                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-72">
-                  <div className="relative">
-                    <Image
-                      src="/ribbon.svg"
-                      alt="Ribbon"
-                      width={288}
-                      height={120}
-                      className="w-72 mt-1"
-                    />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center -mt-8">
-                      <p
-                        className="text-[#B20D78] text-2xl font-bold opacity-80 -mb-1"
-                        style={{
-                          textShadow: "0px 1px 2px rgba(0,0,0,0.15)",
-                        }}
-                      >
-                        MINT STARS
-                      </p>
-
-                      <p
-                        className="text-white text-2xl font-black leading-[0.9]"
-                        style={{
-                          textShadow: `
-                          -1px -1px 0 #E35EAF,
-                          1px -1px 0 #E35EAF,
-                          -1px 1px 0 #E35EAF,
-                          1px 1px 0 #E35EAF,
-                          0 2px 2px rgba(0,0,0,0.3)
-                        `,
-                        }}
-                      >
-                        TO START
-                      </p>
-
-                      <p
-                        className="text-white text-2xl font-black leading-[0.9]"
-                        style={{
-                          textShadow: `
-                          -1px -1px 0 #E35EAF,
-                          1px -1px 0 #E35EAF,
-                          -1px 1px 0 #E35EAF,
-                          1px 1px 0 #E35EAF,
-                          0 2px 2px rgba(0,0,0,0.3)
-                        `,
-                        }}
-                      >
-                        GAME
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {!isMinted ? (
-                  <>
-                    <div className="mt-18 flex justify-center mb-8">
-                      <div className="bg-[#06C3F6] rounded-[10px] h-[37px] flex items-center px-3 py-1 shadow-[0_4px_0px_#5199AD]">
-                        <button
-                          onClick={handleDecrement}
-                          disabled={count <= MIN_COUNT}
-                          className={`w-6 h-6 rounded-full bg-[#8662FF] flex items-center justify-center shadow-[inset_0px_-4px_0px_#6A47E2] ${
-                            count <= MIN_COUNT
-                              ? "opacity-50"
-                              : "hover:bg-[#7452EF] active:shadow-[inset_0px_-2px_0px_#6A47E2]"
-                          }`}
-                        >
-                          <Image
-                            src="/minus.svg"
-                            alt="Decrease"
-                            width={24}
-                            height={24}
-                            className="w-6 h-6"
-                          />
-                        </button>
-
-                        <span
-                          className="text-white text-4xl font-black mx-8 leading-none"
-                          style={{
-                            textShadow: "0px 2px 0px rgba(0,0,0,0.25)",
-                          }}
-                        >
-                          {count}
-                        </span>
-
-                        <button
-                          onClick={handleIncrement}
-                          disabled={count >= MAX_COUNT}
-                          className={`w-6 h-6 rounded-full bg-[#8662FF] flex items-center justify-center shadow-[inset_0px_-4px_0px_#6A47E2] ${
-                            count >= MAX_COUNT
-                              ? "opacity-50"
-                              : "hover:bg-[#7452EF] active:shadow-[inset_0px_-2px_0px_#6A47E2]"
-                          }`}
-                        >
-                          <Image
-                            src="/plus.svg"
-                            alt="Increase"
-                            width={24}
-                            height={24}
-                            className="w-6 h-6"
-                          />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-center">
-                      <button 
-                        onClick={handleMint}
-                        className="bg-[#FFB946] text-white font-black text-2xl h-[37px] px-12 flex items-center justify-center rounded-[10px] shadow-[0_4px_0px_#C68C36] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#C68C36] active:translate-y-[4px] active:shadow-[0_2px_0px_#C68C36] transition-all duration-150"
-                      >
-                        MINT
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="mt-18 flex flex-col items-center justify-center gap-6">
-                      <p className="text-[#A4D555] text-4xl font-black text-center" style={{
-                        textShadow: '0px 2px 0px rgba(0,0,0,0.15)'
-                      }}>
-                        NFT MINTED
-                        <br />
-                        SUCCESSFULLY
-                      </p>
-
-                      <div className="flex flex-col gap-2 w-full text-center">
-                        {txHash && (
-                          <a 
-                            href={`https://sepolia.basescan.org/tx/${txHash}`}
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-[#8662FF] text-sm font-bold underline flex items-center justify-center hover:text-[#7452EF]"
-                          >
-                            <span>View Transaction</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </a>
-                        )}
-                        {nftTokenId && (
-                          <a 
-                            href={getOpenSeaURL(nftTokenId)}
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-[#06C3F6] text-sm font-bold underline flex items-center justify-center hover:text-[#05A3D0]"
-                          >
-                            <span>View on OpenSea</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </a>
-                        )}
-                      </div>
-
-                      <button 
-                        onClick={() => router.push('/play?minted=true')}
-                        className="bg-[#FFB946] text-white font-black text-2xl h-[37px] px-12 flex items-center justify-center rounded-[10px] shadow-[0_4px_0px_#C68C36] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#C68C36] active:translate-y-[4px] active:shadow-[0_2px_0px_#C68C36] transition-all duration-150"
-                      >
-                        STEP 2
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
+        <StartGame isMinted={isMinted} handleMint={handleMint} handleIncrement={handleIncrement} handleDecrement={handleDecrement} count={count} txHash={txHash} nftTokenId={nftTokenId} getOpenSeaURL={getOpenSeaURL} MIN_COUNT={MIN_COUNT} MAX_COUNT={MAX_COUNT} />
 
               <p
                 className="text-white font-bold text-3xl text-center mt-2 px-4"
@@ -1087,67 +964,11 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 flex justify-around bg-white pt-2 pb-6 rounded-t-3xl">
-              <button className="w-16 h-16 bg-[#50a9bf] text-white font-bold rounded-2xl flex flex-col items-center justify-center">
-                <span className="text-sm">MINT</span>
-              </button>
-
-              <div className="relative w-16 h-16">
-                <button 
-                  onClick={handlePlayClick}
-                  className="w-16 h-16 bg-[#f182d1] text-[#c35bae] font-bold rounded-2xl flex flex-col items-center justify-center"
-                >
-                  <Image 
-                    src="/Group 1.svg"
-                    alt="Play"
-                    width={40}
-                    height={20}
-                    className="w-10 h-5"
-                  />
-                </button>
-                {!isMinted && (
-                  <div 
-                    onClick={handlePlayClick}
-                    className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center cursor-pointer"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 17C11.4477 17 11 16.5523 11 16C11 15.4477 11.4477 15 12 15C12.5523 15 13 15.4477 13 16C13 16.5523 12.5523 17 12 17Z" fill="white"/>
-                      <path d="M18 8H17V6C17 3.24 14.76 1 12 1C9.24 1 7 3.24 7 6V8H6C4.9 8 4 8.9 4 10V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V10C20 8.9 19.1 8 18 8ZM9 6C9 4.34 10.34 3 12 3C13.66 3 15 4.34 15 6V8H9V6ZM18 20H6V10H18V20Z" fill="white"/>
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-              <div className="relative w-16 h-16">
-                <button className="w-16 h-16 bg-[#b39ef6] text-white font-bold rounded-2xl flex flex-col items-center justify-center">
-                  <span className="text-2xl mb-1">😀</span>
-                  <span className="text-[10px]">CLAIM</span>
-                  <span className="text-[10px]">ACS</span>
-                </button>
-                <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 17C11.4477 17 11 16.5523 11 16C11 15.4477 11.4477 15 12 15C12.5523 15 13 15.4477 13 16C13 16.5523 12.5523 17 12 17Z" fill="white"/>
-                    <path d="M18 8H17V6C17 3.24 14.76 1 12 1C9.24 1 7 3.24 7 6V8H6C4.9 8 4 8.9 4 10V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V10C20 8.9 19.1 8 18 8ZM9 6C9 4.34 10.34 3 12 3C13.66 3 15 4.34 15 6V8H9V6ZM18 20H6V10H18V20Z" fill="white"/>
-                  </svg>
-                </div>
-              </div>
-
-              <div className="relative w-16 h-16">
-                <button className="w-16 h-16 bg-[#ffda69] text-white font-bold rounded-2xl flex flex-col items-center justify-center">
-                  <span className="text-xl mb-1">🤖</span>
-                  <span className="text-[10px]">SHVAN AI</span>
-                </button>
-                <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 17C11.4477 17 11 16.5523 11 16C11 15.4477 11.4477 15 12 15C12.5523 15 13 15.4477 13 16C13 16.5523 12.5523 17 12 17Z" fill="white"/>
-                    <path d="M18 8H17V6C17 3.24 14.76 1 12 1C9.24 1 7 3.24 7 6V8H6C4.9 8 4 8.9 4 10V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V10C20 8.9 19.1 8 18 8ZM9 6C9 4.34 10.34 3 12 3C13.66 3 15 4.34 15 6V8H9V6ZM18 20H6V10H18V20Z" fill="white"/>
-                  </svg>
-                </div>
-                <div className="absolute -top-2 -right-2 bg-[#e85e76] text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                  SOON
-                </div>
-              </div>
-            </div>
+      {
+        isMinted && (
+          <Claim isMinted={isMinted} handlePlayClick={handlePlayClick} />
+        )
+      }
 
             {showSettings && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
