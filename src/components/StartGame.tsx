@@ -143,7 +143,7 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
             SUCCESSFULLY
           </p>
 
-          <div className="flex flex-col gap-2 w-full text-center">
+          {/* <div className="flex flex-col gap-2 w-full text-center">
             {txHash && (
               <a 
                 href={`https://sepolia.basescan.org/tx/${txHash}`}
@@ -170,7 +170,7 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
                 </svg>
               </a>
             )}
-          </div>
+          </div> */}
 
           <button 
             onClick={() => router.push('/play?minted=true')}

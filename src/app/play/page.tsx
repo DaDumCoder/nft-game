@@ -144,21 +144,21 @@ function PlayContent() {
           {/* Main content */}
           <div className="flex-1 flex flex-col items-center pt-32 px-6">
             {/* VIBE title */}
-            <h1 className="text-[#FFE17B] text-7xl font-black mb-2" style={{
+            <h1 className="text-[#FFE17B] text-7xl font-semibold mb-2" style={{
               textShadow: "4px 4px 0px rgba(0, 0, 0, 0.25)"
             }}>
               VIBE
             </h1>
 
             {/* HIT title */}
-            <h1 className="text-[#8662FF] text-8xl font-black -mt-4 mb-8" style={{
+            <h1 className="text-[#8662FF] text-8xl font-semibold -mt-4 mb-8" style={{
               textShadow: "4px 4px 0px rgba(0, 0, 0, 0.25)"
             }}>
               HIT
             </h1>
 
             {/* Subtitle */}
-            <p className="text-white text-2xl font-bold text-center mb-20" style={{
+            <p className="text-white text-2xl font-medium text-center mb-20" style={{
               textShadow: "2px 2px 0px rgba(0, 0, 0, 0.25)"
             }}>
               CLAIM ALL MISSION NFT'S
@@ -170,7 +170,7 @@ function PlayContent() {
             <div className="flex flex-col gap-6 w-full max-w-[320px]">
               <button 
                 onClick={handlePlayClick}
-                className={`relative bg-[#A4D555] text-white text-2xl font-black py-5 rounded-[30px] shadow-[0_6px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#7BA140] active:translate-y-[4px] active:shadow-[0_2px_0px_#7BA140] transition-all duration-150 ${!isMinted ? 'opacity-80' : ''}`}
+                className={`relative bg-[#A4D555] text-white text-2xl font-semibold py-5 rounded-[30px] shadow-[0_6px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#7BA140] active:translate-y-[4px] active:shadow-[0_2px_0px_#7BA140] transition-all duration-150 ${!isMinted ? 'opacity-80' : ''}`}
               >
                 START GAME
                 {!isMinted && (
@@ -182,12 +182,12 @@ function PlayContent() {
                   </div>
                 )}
               </button>
-              <button onClick={handleCheckNFT} className="bg-[#A4D555] text-white text-2xl font-black py-5 rounded-[30px] shadow-[0_6px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#7BA140] active:translate-y-[4px] active:shadow-[0_2px_0px_#7BA140] transition-all duration-150">
+              <button onClick={handleCheckNFT} className="bg-[#A4D555] text-white text-2xl font-semibold py-5 rounded-[30px] shadow-[0_6px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#7BA140] active:translate-y-[4px] active:shadow-[0_2px_0px_#7BA140] transition-all duration-150">
                 CHECK NFT
               </button>
-              <p className="text-[#a89bf3] text-3xl font-bold mt-auto mb-24 text-center">
-              STEP 2...
-            </p>
+              <p className="text-[#a89bf3] text-3xl font-medium mt-auto mb-24 text-center">
+                STEP 2...
+              </p>
             </div>
 
           </div>
@@ -196,12 +196,12 @@ function PlayContent() {
           <div className="absolute bottom-0 left-0 right-0 flex justify-around bg-white pt-2 pb-6 rounded-t-3xl">
             <button 
               onClick={() => router.push('/')}
-              className="w-16 h-16 bg-[#50a9bf] text-white font-bold rounded-2xl flex flex-col items-center justify-center"
+              className="w-16 h-16 bg-[#50a9bf] text-white font-medium rounded-2xl flex flex-col items-center justify-center"
             >
               <span className="text-sm">MINT</span>
             </button>
 
-            <button className="w-16 h-16 bg-[#f182d1] text-[#c35bae] font-bold rounded-2xl flex flex-col items-center justify-center">
+            <button className="w-16 h-16 bg-[#f182d1] text-[#c35bae] font-medium rounded-2xl flex flex-col items-center justify-center">
               <Image 
                 src="/Group 1.svg"
                 alt="Play"
@@ -213,7 +213,7 @@ function PlayContent() {
 
             {/* CLAIM ACS with overlay and lock */}
             <div className="relative w-16 h-16">
-              <button className="w-16 h-16 bg-[#b39ef6] text-white font-bold rounded-2xl flex flex-col items-center justify-center">
+              <button className="w-16 h-16 bg-[#b39ef6] text-white font-medium rounded-2xl flex flex-col items-center justify-center">
                 <span className="text-2xl mb-1">😀</span>
                 <span className="text-[10px]">CLAIM</span>
                 <span className="text-[10px]">ACS</span>
@@ -228,7 +228,7 @@ function PlayContent() {
 
             {/* SHVAN AI with overlay and lock */}
             <div className="relative w-16 h-16">
-              <button className="w-16 h-16 bg-[#ffda69] text-white font-bold rounded-2xl flex flex-col items-center justify-center">
+              <button className="w-16 h-16 bg-[#ffda69] text-white font-medium rounded-2xl flex flex-col items-center justify-center">
                 <span className="text-xl mb-1">🤖</span>
                 <span className="text-[10px]">SHVAN AI</span>
               </button>
@@ -238,7 +238,7 @@ function PlayContent() {
                   <path d="M18 8H17V6C17 3.24 14.76 1 12 1C9.24 1 7 3.24 7 6V8H6C4.9 8 4 8.9 4 10V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V10C20 8.9 19.1 8 18 8ZM9 6C9 4.34 10.34 3 12 3C13.66 3 15 4.34 15 6V8H9V6ZM18 20H6V10H18V20Z" fill="white"/>
                 </svg>
               </div>
-              <div className="absolute -top-2 -right-2 bg-[#e85e76] text-white text-[10px] font-bold px-2 py-1 rounded-full">
+              <div className="absolute -top-2 -right-2 bg-[#e85e76] text-white text-[10px] font-medium px-2 py-1 rounded-full">
                 SOON
               </div>
             </div>
