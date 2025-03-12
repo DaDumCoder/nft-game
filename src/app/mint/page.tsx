@@ -332,6 +332,45 @@ export default function Home() {
         ],
         provider
       );
+      // Check if connected to the correct chain
+      const chainId = await provider.getNetwork().then(network => network.chainId);
+
+      console.log("Chain ID:", chainId);
+      if (chainId !== 1868) { // Base Sepolia Chain ID
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x74c' }], // 1868 in hex
+          });
+        } catch (switchError: any) {
+          // This error code indicates that the chain has not been added to MetaMask
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: '0x74c',
+                  chainName: 'Soneium',
+                  nativeCurrency: {
+                    name: 'ETH',
+                    symbol: 'ETH', 
+                    decimals: 18
+                  },
+                  rpcUrls: ['https://rpc.soneium.org'],
+                  blockExplorerUrls: ['https://explorer.soneium.org']
+                }]
+              });
+            } catch (addError) {
+              toast.error("Please Switch to Soneium Network");
+
+              return;
+            }
+          } else {
+            toast.error("Failed to switch to Soneium Network");
+            return;
+          }
+        }
+      }
 
       // Check token balance
       const tokenBalance = await contractInstanceToken.balanceOf(account.address);
