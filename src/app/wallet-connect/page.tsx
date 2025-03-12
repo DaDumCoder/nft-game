@@ -36,7 +36,7 @@ export default function WalletConnect() {
           <div className="w-full max-w-[340px] space-y-4">
             <div className="text-center">
               <p className="text-white text-lg mb-4">CONNECT YOUR WALLET</p>
-              <div className="w-full bg-[#6d5ceb]/20 hover:bg-[#6d5ceb]/30 backdrop-blur-sm text-white rounded-xl p-4">
+              <div className="w-full bg-[#6d5ceb]/20 hover:bg-[#6d5ceb]/30 backdrop-blur-sm text-white rounded-xl p-4" style={{ fontFamily: "Digitalt, sans-serif" }}>
                 <ConnectButton 
                   key="connect-button"
                   client={client}
