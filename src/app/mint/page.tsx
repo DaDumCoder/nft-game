@@ -40,7 +40,7 @@ import SuccessBanner from "@/components/SuccessBanner";
 import Claim from "@/components/Claim";
 import StartGame from "@/components/StartGame";
 import { MintingLoader } from "@/components/mint/MintingLoader";
-import { formatEther, parseEther, parseUnits } from "ethers/lib/utils";
+import { formatEther } from "ethers/lib/utils";
 
 export default function Home() {
   const [isSoundOn, setIsSoundOn] = useState(true);
