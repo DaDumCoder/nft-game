@@ -4,11 +4,16 @@ import { useRouter } from 'next/navigation';
 import { useActiveWallet } from "thirdweb/react";
 import { client } from "@/client";
 import { useEffect } from "react";
+import { defineChain } from "thirdweb/chains";
+
+// import { soneium } from "thirdweb/chains";
 
 export default function WalletConnect() {
   const router = useRouter();
   const wallet = useActiveWallet();
+  const chain = defineChain(1868);
 
+  console.log("Chain:", chain);
   useEffect(() => {
     if (wallet) {
       console.log("Wallet already connected, redirecting...");
@@ -37,7 +42,7 @@ export default function WalletConnect() {
             <div className="text-center">
               <p className="text-white text-lg mb-4">CONNECT YOUR WALLET</p>
               <div className="w-full bg-[#6d5ceb]/20 hover:bg-[#6d5ceb]/30 backdrop-blur-sm text-white rounded-xl p-4" style={{ fontFamily: "Digitalt, sans-serif" }}>
-                <ConnectButton 
+                <ConnectButton  chain={chain}
                   key="connect-button"
                   client={client}
                   onConnect={() => {
