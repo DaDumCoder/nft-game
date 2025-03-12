@@ -27,7 +27,7 @@ export default function WalletConnect() {
 
         <div className="h-full w-full bg-[#7B61FF] flex flex-col items-center justify-center p-6">
           <div className="text-center mb-12">
-            <h1 className="text-6xl font-bold">
+            <h1 className="text-6xl font-normal">
               <span className="text-yellow-300">VIBE</span>
               <span className="text-white">HIT</span>
             </h1>

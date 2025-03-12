@@ -133,7 +133,7 @@ function PlayContent() {
                 <Image src="/Group 105.svg" alt="Gem" width={44} height={44} className="w-11 h-11" />
               </div>
               <div className="bg-[#21272e] pl-6 pr-4 py-[3px] rounded-[12px] flex items-center">
-                <span className="text-white text-2xl font-bold tracking-wider text-right min-w-[5px] justify-end flex"
+                <span className="text-white text-2xl font-normal tracking-wider text-right min-w-[5px] justify-end flex"
                   style={{ textShadow: "2px 2px 0px rgba(0, 0, 0, 0.25)" }}>
                   0010
                 </span>
@@ -196,7 +196,7 @@ function PlayContent() {
           <div className="absolute bottom-0 left-0 right-0 flex justify-around bg-white pt-2 pb-6 rounded-t-3xl">
             <button 
               onClick={() => router.push('/')}
-              className="w-16 h-16 bg-[#50a9bf] text-white font-medium rounded-2xl flex flex-col items-center justify-center"
+              className="w-14 h-14 bg-[#50a9bf] text-white font-normal rounded-2xl flex flex-col items-center justify-center"
             >
               <span className="text-sm">MINT</span>
             </button>
@@ -213,7 +213,7 @@ function PlayContent() {
 
             {/* CLAIM ACS with overlay and lock */}
             <div className="relative w-16 h-16">
-              <button className="w-16 h-16 bg-[#b39ef6] text-white font-medium rounded-2xl flex flex-col items-center justify-center">
+              <button className="w-16 h-16 bg-[#b39ef6] text-white font-normal rounded-2xl flex flex-col items-center justify-center">
                 <span className="text-2xl mb-1">😀</span>
                 <span className="text-[10px]">CLAIM</span>
                 <span className="text-[10px]">ACS</span>
@@ -228,7 +228,7 @@ function PlayContent() {
 
             {/* SHVAN AI with overlay and lock */}
             <div className="relative w-16 h-16">
-              <button className="w-16 h-16 bg-[#ffda69] text-white font-medium rounded-2xl flex flex-col items-center justify-center">
+              <button className="w-16 h-16 bg-[#ffda69] text-white font-normal rounded-2xl flex flex-col items-center justify-center">
                 <span className="text-xl mb-1">🤖</span>
                 <span className="text-[10px]">SHVAN AI</span>
               </button>
@@ -238,7 +238,7 @@ function PlayContent() {
                   <path d="M18 8H17V6C17 3.24 14.76 1 12 1C9.24 1 7 3.24 7 6V8H6C4.9 8 4 8.9 4 10V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V10C20 8.9 19.1 8 18 8ZM9 6C9 4.34 10.34 3 12 3C13.66 3 15 4.34 15 6V8H9V6ZM18 20H6V10H18V20Z" fill="white"/>
                 </svg>
               </div>
-              <div className="absolute -top-2 -right-2 bg-[#e85e76] text-white text-[10px] font-medium px-2 py-1 rounded-full">
+              <div className="absolute -top-2 -right-2 bg-[#e85e76] text-white text-[10px] font-normal px-2 py-1 rounded-full">
                 SOON
               </div>
             </div>

@@ -19,6 +19,11 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
     const router = useRouter();
 
     console.log(txHash, nftTokenId,getOpenSeaURL);
+
+console.log("count",count);
+
+
+    
     
 
   return (
@@ -34,7 +39,7 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center -mt-8">
           <p
-            className="text-[#B20D78] text-2xl font-medium opacity-80 -mb-1"
+            className="text-[#B20D78] text-2xl font-normal opacity-80 -mb-1"
             style={{
               textShadow: "0px 1px 2px rgba(0,0,0,0.15)",
             }}
@@ -43,7 +48,7 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
           </p>
 
           <p
-            className="text-white text-2xl font-semibold leading-[0.9]"
+            className="text-white text-2xl font-normal leading-[0.9]"
             style={{
               textShadow: `
               -1px -1px 0 #E35EAF,
@@ -58,7 +63,7 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
           </p>
 
           <p
-            className="text-white text-2xl font-semibold leading-[0.9]"
+            className="text-white text-2xl font-normal leading-[0.9]"
             style={{
               textShadow: `
               -1px -1px 0 #E35EAF,
@@ -98,7 +103,7 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
             </button>
 
             <span
-              className="text-white text-4xl font-black mx-8 leading-none"
+              className="text-white text-4xl font-normal mx-8 leading-none"
               style={{
                 textShadow: "0px 2px 0px rgba(0,0,0,0.25)",
               }}
@@ -129,16 +134,23 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
         <div className="flex justify-center">
           <button 
             onClick={handleMint}
-            className="bg-[#FFB946] text-white font-semibold text-2xl h-[32px] px-12 flex items-center justify-center rounded-[10px] shadow-[0_3px_0px_#C68C36] hover:translate-y-[2px] hover:shadow-[0_3px_0px_#C68C36] active:translate-y-[3px] active:shadow-[0_1px_0px_#C68C36] transition-all duration-150"
+            className="bg-[#FFB946] text-white font-normal text-2xl h-[32px] px-12 flex items-center justify-center rounded-[10px] shadow-[0_3px_0px_#C68C36] hover:translate-y-[2px] hover:shadow-[0_3px_0px_#C68C36] active:translate-y-[3px] active:shadow-[0_1px_0px_#C68C36] transition-all duration-150"
           >
             MINT
           </button>
+    
+        </div>
+
+        <div className="flex justify-center">
+        <p className="text-[#666] text-sm mt-6 font-normal text-center">
+            1 NFT = 34 ASTR Token
+          </p>
         </div>
       </>
     ) : (
       <>
         <div className="mt-18 flex flex-col items-center justify-center gap-6">
-          <p className="text-[#A4D555] text-4xl font-semibold text-center" style={{
+          <p className="text-[#A4D555] text-4xl font-normal text-center" style={{
             textShadow: '0px 2px 0px rgba(0,0,0,0.15)'
           }}>
             NFT MINTED
@@ -177,7 +189,7 @@ const StartGame = ({ isMinted, handleMint, handleIncrement, handleDecrement, cou
 
           <button 
             onClick={() => router.push('/play?minted=true')}
-            className="bg-[#FFB946] text-white font-semibold text-2xl h-[32px] px-12 flex items-center justify-center rounded-[10px] shadow-[0_3px_0px_#C68C36] hover:translate-y-[2px] hover:shadow-[0_3px_0px_#C68C36] active:translate-y-[3px] active:shadow-[0_1px_0px_#C68C36] transition-all duration-150"
+            className="bg-[#FFB946] text-white font-normal text-2xl h-[32px] px-12 flex items-center justify-center rounded-[10px] shadow-[0_3px_0px_#C68C36] hover:translate-y-[2px] hover:shadow-[0_3px_0px_#C68C36] active:translate-y-[3px] active:shadow-[0_1px_0px_#C68C36] transition-all duration-150"
           >
             STEP 2
           </button>

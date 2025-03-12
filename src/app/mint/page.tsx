@@ -40,12 +40,13 @@ import SuccessBanner from "@/components/SuccessBanner";
 import Claim from "@/components/Claim";
 import StartGame from "@/components/StartGame";
 import { MintingLoader } from "@/components/mint/MintingLoader";
+import { formatEther, parseEther, parseUnits } from "ethers/lib/utils";
 
 export default function Home() {
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const [count, setCount] = useState(10);
+  const [count, setCount] = useState(1);
   const MIN_COUNT = 1;
   const MAX_COUNT = 100;
   const [isMinted, setIsMinted] = useState(false);
@@ -336,8 +337,11 @@ export default function Home() {
       const tokenBalance = await contractInstanceToken.balanceOf(account.address);
       console.log("Token balance:", tokenBalance.toString());
 
-      if (tokenBalance.lt("34000000000000000000")) {
-        toast.error("Insufficient token balance. You need at least 34 ASTR to mint.", {
+      const requiredAmount = BigInt(count) * BigInt(34000000000000000000);
+
+      if (tokenBalance.lt(requiredAmount)) {
+        const formattedRequiredAmount = formatEther(requiredAmount);
+        toast.error(`Insufficient token balance. You need at least ${formattedRequiredAmount} ASTR to mint.`, {
           style: {
             borderRadius: '10px',
             background: '#ef4444',
@@ -354,13 +358,14 @@ export default function Home() {
         "0x1D98101247FB761c9aDC4e2EaD6aA6b6a00c170e"
       );
 
-      if (currentAllowance.lt("34000000000000000000")) {
+      const requiredAllowance = BigInt(34000000000000000000) * BigInt(count); 
+      if (currentAllowance.lt(requiredAllowance)) {
         setApprovalInProgress(true);
         
         const contractWithSignerToken = contractInstanceToken.connect(signer);
         const approvalTx = await contractWithSignerToken.approve(
           "0x1D98101247FB761c9aDC4e2EaD6aA6b6a00c170e",
-          "34000000000000000000"
+          requiredAllowance
         );
 
         console.log("Approval transaction:", approvalTx);
@@ -393,7 +398,7 @@ export default function Home() {
       
       const claimTx = await contractWithSigner.claim(
         account.address,
-        1,
+        count,
         "0x2CAE934a1e84F693fbb78CA5ED3B0A6893259441",
         BigInt("34000000000000000000"),
         [
@@ -861,7 +866,7 @@ export default function Home() {
 
                 <div className="bg-[#21272e] pl-6 pr-4 py-[3px] rounded-[12px] flex items-center">
                   <span
-                    className="text-white text-2xl font-medium tracking-wider text-right min-w-[5px] justify-end flex"
+                    className="text-white text-2xl font-normal tracking-wider text-right min-w-[5px] justify-end flex"
                     style={{
                       textShadow: "2px 2px 0px rgba(0, 0, 0, 0.25)",
                     }}
@@ -892,7 +897,7 @@ export default function Home() {
 
               {!isMinted && (
                 <h1
-                  className="text-6xl font-medium text-white tracking-wide mb-1 relative z-10"
+                  className="text-6xl font-normal text-white tracking-wide mb-1 relative z-10"
                   style={{
                     textShadow: "3px 3px 0 #b64a8a, 6px 6px 0 #21272e",
                     fontFamily: "Digitalt, sans-serif",

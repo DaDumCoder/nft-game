@@ -105,7 +105,7 @@ export default function Home() {
                 transition={{ duration: 0.5, delay: 0.5 }}
                 className="text-center"
               >
-                <h1 className="text-6xl font-bold">
+                <h1 className="text-6xl font-normal">
                   <motion.span
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -218,7 +218,7 @@ export default function Home() {
         </div>
         
         <h1 
-          className="text-6xl font-extrabold text-white tracking-wide mb-4"
+          className="text-6xl font-normal text-white tracking-wide mb-4"
           style={{
             textShadow: "3px 3px 0 #b64a8a, 6px 6px 0 #21272e",
             fontFamily: "Digitalt, sans-serif",
@@ -228,7 +228,7 @@ export default function Home() {
         </h1>
         
         <p 
-          className="text-white text-xl font-bold text-center mb-8"
+          className="text-white text-xl font-normal text-center mb-8"
           style={{
             textShadow: "2px 2px 0 #b64a8a",
           }}
@@ -245,7 +245,7 @@ export default function Home() {
         ) : (
           <button 
             onClick={() => router.push('/wallet-connect')}
-            className="bg-[#FFB946] text-white font-black text-2xl h-[45px] px-10 flex items-center justify-center rounded-[12px] shadow-[0_4px_0px_#C68C36] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#C68C36] active:translate-y-[4px] active:shadow-[0_2px_0px_#C68C36] transition-all duration-150"
+            className="bg-[#FFB946] text-white font-normal text-2xl h-[45px] px-10 flex items-center justify-center rounded-[12px] shadow-[0_4px_0px_#C68C36] hover:translate-y-[2px] hover:shadow-[0_4px_0px_#C68C36] active:translate-y-[4px] active:shadow-[0_2px_0px_#C68C36] transition-all duration-150"
           >
             GET STARTED
           </button>
