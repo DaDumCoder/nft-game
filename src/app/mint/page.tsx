@@ -342,9 +342,9 @@ export default function Home() {
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: '0x74c' }], // 1868 in hex
           });
-        } catch (switchError: any) {
-          // This error code indicates that the chain has not been added to MetaMask
-          if (switchError.code === 4902) {
+        } catch (switchError: unknown) {
+          // Type guard to check if the error has the expected structure
+          if (typeof switchError === 'object' && switchError && 'code' in switchError && switchError.code === 4902) {
             try {
               await window.ethereum.request({
                 method: 'wallet_addEthereumChain',
@@ -360,9 +360,8 @@ export default function Home() {
                   blockExplorerUrls: ['https://explorer.soneium.org']
                 }]
               });
-            } catch (addError) {
+            } catch {
               toast.error("Please Switch to Soneium Network");
-
               return;
             }
           } else {
@@ -370,6 +369,9 @@ export default function Home() {
             return;
           }
         }
+      } else {
+        toast.error("Failed to switch to Soneium Network");
+        return;
       }
 
       // Check token balance
