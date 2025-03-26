@@ -88,7 +88,7 @@ function PlayContent() {
   };
 
   const handleMintMore = () => {
-    router.push('/mint');
+    router.push('/mintmore');
   };
 
   return (

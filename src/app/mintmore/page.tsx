@@ -204,7 +204,7 @@ export default function Home() {
         console.log("NFT balance:", balance.toString());
         
         if (Number(balance) > 0) {
-          setIsMinted(true);
+          // setIsMinted(true);
         }
       } catch (error) {
         console.error("Error checking balance:", error);
