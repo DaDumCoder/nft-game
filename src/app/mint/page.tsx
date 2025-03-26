@@ -52,17 +52,27 @@ export default function Home() {
   const [isMinted, setIsMinted] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  // const [isApproved, setIsApproved] = useState(false);
   const [approvalInProgress, setApprovalInProgress] = useState(false);
   const [claimInProgress, setClaimInProgress] = useState(false);
-  // const [contractMetadata, setContractMetadata] = useState({});
-  // const [claimCondition, setClaimCondition] = useState(null);
-  // const [claimedSupply, setClaimedSupply] = useState<bigint | null>(null);
-  // const [totalNFTSupply, setTotalNFTSupply] = useState<bigint | null>(null);
-  // const [txHistory, setTxHistory] = useState<Array<{type: string, status: string, timestamp: number, hash?: string}>>([]);
   const [nftTokenId, setNftTokenId] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
-  // const [address, setAddress] = useState<any>(null);
+
+  // Reset effect must be placed right after all useState declarations
+  useEffect(() => {
+    // Reset all states to their initial values
+    setIsSoundOn(true);
+    setShowSettings(false);
+    setShowInfo(false);
+    setCount(1);
+    setIsMinted(false);
+    setIsConnected(false);
+    setIsLoading(true);
+    setApprovalInProgress(false);
+    setClaimInProgress(false);
+    setNftTokenId(null);
+    setTxHash(null);
+  }, []); // Empty dependency array means this runs once on mount
+
   const wallet = useActiveWallet();
   const account = useActiveAccount();
   const chain = defineChain({
@@ -204,7 +214,7 @@ export default function Home() {
         console.log("NFT balance:", balance.toString());
         
         if (Number(balance) > 0) {
-          setIsMinted(true);
+          // setIsMinted(true);
         }
       } catch (error) {
         console.error("Error checking balance:", error);

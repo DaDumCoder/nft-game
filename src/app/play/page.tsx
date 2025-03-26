@@ -87,6 +87,10 @@ function PlayContent() {
     // router.push('/mint');
   };
 
+  const handleMintMore = () => {
+    router.push('/mint');
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       {/* Phone frame */}
@@ -185,11 +189,17 @@ function PlayContent() {
               <button onClick={handleCheckNFT} className="bg-[#A4D555] text-white text-2xl font-medium py-4 rounded-[30px] shadow-[0_4px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_3px_0px_#7BA140] active:translate-y-[3px] active:shadow-[0_1px_0px_#7BA140] transition-all duration-150">
                 CHECK NFT
               </button>
+              <button onClick={handleMintMore} className="bg-[#A4D555] text-white text-2xl font-medium py-4 rounded-[30px] shadow-[0_4px_0px_#7BA140] hover:translate-y-[2px] hover:shadow-[0_3px_0px_#7BA140] active:translate-y-[3px] active:shadow-[0_1px_0px_#7BA140] transition-all duration-150">
+                Mint More
+              </button>
               <p className="text-[#a89bf3] text-3xl font-normal mt-auto mb-24 text-center">
                 STEP 2...
               </p>
+        
+
             </div>
 
+         
           </div>
 
           {/* Bottom navigation */}
